@@ -1,0 +1,1 @@
+C:\Users\jfane\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\Scripts\pyinstaller --onefile --hidden-import=android_sms_gateway --hidden-import=apscheduler --hidden-import=requests --collect-all apscheduler app/main.py
