@@ -1,6 +1,8 @@
 import time
 
 from android_sms_gateway import client, domain
+
+from app.config import AppConfig
 from app.logger import Logger
 
 class SMSSender:
@@ -17,7 +19,7 @@ class SMSSender:
         )
 
         with client.APIClient(
-            self.username,
+            self.user,
             self.password,
             base_url=self.api_url
         ) as c:
@@ -34,3 +36,9 @@ class SMSSender:
             else:
                 self.logger.info(f"Envio efetuado com sucesso!")
 
+if __name__ == "__main__":
+    logger = Logger()
+    app_config = AppConfig()
+    sms_sender = SMSSender(logger=logger,api_url=app_config.sms_sender_url, user=app_config.sms_sender_usr,
+                           password=app_config.sms_sender_pwd)
+    sms_sender.send("teste",app_config.phone_numbers)
