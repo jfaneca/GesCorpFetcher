@@ -31,8 +31,9 @@ class Orchestrator:
         new_alerts = get_alerts_missing_at_the_db(gc_alerts, db_alerts)
         if new_alerts:
             for new_alert in new_alerts:
-                self.logger.info(f"Data hora do novo alerta:{new_alert.data_hora_alerta}")
-                message = (f"Morada:{new_alert.address} ",
+                self.logger.info(f"id:{new_alert.id}, hora:{new_alert.data_hora_alerta}")
+                message = (f"ID:{new_alert.id} ",
+                           f"Morada:{new_alert.address} ",
                            f"Localidade:{new_alert.locality} ",
                            f"Lat:{new_alert.sado_latitude_gps} ",
                            f"Long:{new_alert.sado_longitude_gps} ",
