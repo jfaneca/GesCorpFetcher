@@ -48,7 +48,7 @@ class GescorpClient:
         }
         response = requests.get(self.incidents_url, headers=REQ_HEADERS)
         # Raise an exception for bad status codes (4xx or 5xx)
-        #response.raise_for_status()
+        response.raise_for_status()
 
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
