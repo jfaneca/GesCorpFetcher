@@ -32,12 +32,11 @@ class Orchestrator:
         if new_alerts:
             for new_alert in new_alerts:
                 self.logger.info(f"id:{new_alert.id}, hora:{new_alert.data_hora_alerta}")
-                message = (f"ID:{new_alert.id} ",
-                           f"Morada:{new_alert.address} ",
-                           f"Localidade:{new_alert.locality} ",
-                           f"Lat:{new_alert.sado_latitude_gps} ",
-                           f"Long:{new_alert.sado_longitude_gps} ",
-                           f"Data hora:{new_alert.data_hora_alerta}")
+                viaturas_str = " "
+                if new_alert.viaturas:
+                    flattened_viaturas = [item for sublist in new_alert.viaturas for item in sublist]
+                    viaturas_str = " ".join(flattened_viaturas)
+                message = f"Morada:{new_alert.address}, loc:{new_alert.locality}, class:{new_alert.classificacao}, desc_class:{new_alert.desc_classificacao}, n_viaturas:{new_alert.n_viaturas}, n_bombeiros:{new_alert.n_bombeiros}, viaturas:{viaturas_str}, estado:{new_alert.estado}, {new_alert.data_hora_alerta}"
                 phone_numbers = self.app_config.phone_numbers
                 self.sms_sender.send(message=message, phone_numbers=phone_numbers)
                 self.db_client.insert_record(new_alert.id)

@@ -28,6 +28,7 @@ class SMSSender:
 
             state = c.get_state(state.id)
             while state.state == 'Pending':
+                self.logger.info(f"Pending, sleeping half a second")
                 time.sleep(0.5)
                 state = c.get_state(state.id)
 

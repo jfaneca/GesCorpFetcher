@@ -48,7 +48,7 @@ class GescorpClient:
         }
         response = requests.get(self.incidents_url, headers=REQ_HEADERS)
         # Raise an exception for bad status codes (4xx or 5xx)
-        response.raise_for_status()
+        #response.raise_for_status()
 
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
@@ -57,8 +57,9 @@ class GescorpClient:
             if incidents_data:
                 self.logger.info(f"#incidents at gescorp={len(incidents_data)}")
             for incident in incidents_data:
-                #if incident.get("estado") == "Alerta" or incident.get("estado") == "Em Curso":
-                if incident.get("estado") == "Alerta":
+                estado = incident.get("estado")
+                if estado == "Alerta" or estado == "Em Curso":
+                #if incident.get("estado") == "Alerta":
                     id = incident.get("id")
                     numero = incident.get("numero")
                     numero_cdos = incident.get("numero_cdos")
@@ -67,8 +68,15 @@ class GescorpClient:
                     data_hora_alerta = incident.get("data_hora_alerta")
                     sado_latitude_gps = incident.get("sado_latitude_gps")
                     sado_longitude_gps = incident.get("sado_longitude_gps")
+                    classificacao = incident.get("classificacao")
+                    desc_classificacao = incident.get("desc_classificacao")
+                    n_bombeiros = incident.get("n_bombeiros")
+                    n_viaturas = incident.get("n_viaturas")
+                    viaturas = incident.get("viaturas")
                     alert = Alert(id=id, numero=numero,numero_cdos=numero_cdos,address=address, locality=locality,
-                                  data_hora_alerta=data_hora_alerta, sado_latitude_gps=sado_latitude_gps, sado_longitude_gps=sado_longitude_gps)
+                                  data_hora_alerta=data_hora_alerta, sado_latitude_gps=sado_latitude_gps,
+                                  sado_longitude_gps=sado_longitude_gps, classificacao=classificacao, desc_classificacao=desc_classificacao,
+                                  n_bombeiros=n_bombeiros, n_viaturas=n_viaturas, estado=estado, viaturas=viaturas)
                     self.logger.info(f"Alerta data_hora:{data_hora_alerta}")
                     alerts.append(alert)
 
