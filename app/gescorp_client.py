@@ -53,32 +53,40 @@ class GescorpClient:
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
             data = response.json()
-            incidents_data = data.get("incident", [])  # Safely get the "incident" list
-            if incidents_data:
-                self.logger.info(f"#incidents at gescorp={len(incidents_data)}")
-            for incident in incidents_data:
-                estado = incident.get("estado")
-                if estado == "Alerta" or estado == "Em Curso":
-                #if incident.get("estado") == "Alerta":
-                    id = incident.get("id")
-                    numero = incident.get("numero")
-                    numero_cdos = incident.get("numero_cdos")
-                    address = incident.get("morada")
-                    locality = incident.get("localidade_morada")
-                    data_hora_alerta = incident.get("data_hora_alerta")
-                    sado_latitude_gps = incident.get("sado_latitude_gps")
-                    sado_longitude_gps = incident.get("sado_longitude_gps")
-                    classificacao = incident.get("classificacao")
-                    desc_classificacao = incident.get("desc_classificacao")
-                    n_bombeiros = incident.get("n_bombeiros")
-                    n_viaturas = incident.get("n_viaturas")
-                    viaturas = incident.get("viaturas")
-                    alert = Alert(id=id, numero=numero,numero_cdos=numero_cdos,address=address, locality=locality,
-                                  data_hora_alerta=data_hora_alerta, sado_latitude_gps=sado_latitude_gps,
-                                  sado_longitude_gps=sado_longitude_gps, classificacao=classificacao, desc_classificacao=desc_classificacao,
-                                  n_bombeiros=n_bombeiros, n_viaturas=n_viaturas, estado=estado, viaturas=viaturas)
-                    self.logger.info(f"Alerta data_hora:{data_hora_alerta}")
-                    alerts.append(alert)
+            alerts = self.get_incidents_from_gescorp_json(data)
+
+        return alerts
+
+    def get_incidents_from_gescorp_json(self, json_data):
+        alerts = []
+
+        incidents_data = json_data.get("incident", [])  # Safely get the "incident" list
+        if incidents_data:
+            self.logger.info(f"#incidents at gescorp={len(incidents_data)}")
+        for incident in incidents_data:
+            estado = incident.get("estado")
+            if estado == "Alerta" or estado == "Em Curso":
+                # if incident.get("estado") == "Alerta":
+                id = incident.get("id")
+                numero = incident.get("numero")
+                numero_cdos = incident.get("numero_cdos")
+                address = incident.get("morada")
+                locality = incident.get("localidade_morada")
+                data_hora_alerta = incident.get("data_hora_alerta")
+                sado_latitude_gps = incident.get("sado_latitude_gps")
+                sado_longitude_gps = incident.get("sado_longitude_gps")
+                classificacao = incident.get("classificacao")
+                desc_classificacao = incident.get("desc_classificacao")
+                n_bombeiros = incident.get("n_bombeiros")
+                n_viaturas = incident.get("n_viaturas")
+                viaturas = incident.get("viaturas")
+                alert = Alert(id=id, numero=numero, numero_cdos=numero_cdos, address=address, locality=locality,
+                              data_hora_alerta=data_hora_alerta, sado_latitude_gps=sado_latitude_gps,
+                              sado_longitude_gps=sado_longitude_gps, classificacao=classificacao,
+                              desc_classificacao=desc_classificacao,
+                              n_bombeiros=n_bombeiros, n_viaturas=n_viaturas, estado=estado, viaturas=viaturas)
+                self.logger.info(f"Alerta data_hora:{data_hora_alerta}")
+                alerts.append(alert)
 
         return alerts
 

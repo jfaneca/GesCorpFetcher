@@ -1,3 +1,4 @@
+import os
 import time
 
 from android_sms_gateway import client, domain
@@ -17,6 +18,7 @@ class SMSSender:
             message,
             phone_numbers
         )
+        current_pid = os.getpid()
 
         with client.APIClient(
             self.user,
@@ -28,14 +30,17 @@ class SMSSender:
 
             state = c.get_state(state.id)
             while state.state == 'Pending':
-                self.logger.info(f"Pending, sleeping half a second")
+                self.logger.info(f"Pending, sleeping half a second. Message:{message}, pid:[{current_pid}]")
                 time.sleep(0.5)
                 state = c.get_state(state.id)
 
             if state.state == 'Failed':
-                self.logger.info(f"Envio falhado")
+                self.logger.error(f"Envio falhado. Message:{message}, pid:[{current_pid}]")
             else:
-                self.logger.info(f"Envio efetuado com sucesso!")
+                self.logger.info(f"Envio efetuado com sucesso! Message:{message}, pid:[{current_pid}]")
+                return True
+
+        return False
 
 if __name__ == "__main__":
     logger = Logger()
