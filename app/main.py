@@ -8,6 +8,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from app.logger import Logger
 from app.orchestrator import Orchestrator
 from app.sms_sender import SMSSender
+from app.wu_client import WUClient
 
 logger = Logger()
 app_logger = logger.get_logger()
@@ -15,7 +16,8 @@ app_config = AppConfig()
 gescorp_client = GescorpClient(logger, app_config)
 db_client = DBClient(logger)
 sms_sender = SMSSender(logger=logger, api_url=app_config.sms_sender_url, user=app_config.sms_sender_usr, password=app_config.sms_sender_pwd)
-orchestrator = Orchestrator(logger, app_config,gescorp_client, db_client, sms_sender)
+wu_client = WUClient(logger=logger,time_out=15)
+orchestrator = Orchestrator(logger, app_config,gescorp_client, db_client, sms_sender, wu_client)
 
 def fetch_gescorp_alerts():
     orchestrator.notify_new_alerts()

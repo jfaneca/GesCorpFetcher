@@ -5,6 +5,8 @@ from app.db_client import DBClient
 from app.gescorp_client import GescorpClient
 from app.logger import Logger
 from app.sms_sender import SMSSender
+from app.wu_client import WUClient
+
 
 def get_alerts_missing_at_the_db(gc_alerts, db_alerts):
     missing_alerts = []
@@ -19,12 +21,14 @@ def get_alerts_missing_at_the_db(gc_alerts, db_alerts):
     return missing_alerts
 
 class Orchestrator:
-    def __init__(self, logger:Logger, app_config:AppConfig, gescorp_client:GescorpClient, db_client:DBClient, sms_sender:SMSSender):
+    def __init__(self, logger:Logger, app_config:AppConfig, gescorp_client:GescorpClient, db_client:DBClient,
+                 sms_sender:SMSSender, wu_client: WUClient):
         self.app_config = app_config
         self.gescorp_client = gescorp_client
         self.db_client = db_client
         self.logger = logger.get_logger()
         self.sms_sender = sms_sender
+        self.wu_client = wu_client
         self.test_mode = False
 
     def notify_new_alerts(self):
@@ -47,6 +51,11 @@ class Orchestrator:
                     if self.sms_sender.send(message=message, phone_numbers=phone_numbers):
                         self.logger.info(f"DB write id:{new_alert.id}, numero:{new_alert.numero}, hora:{new_alert.data_hora_alerta}")
                         self.db_client.insert_record(new_alert.id)
+                    else:
+                        if self.wu_client.send(phone_numbers, message):
+                            self.logger.info(
+                                f"DB write id:{new_alert.id}, numero:{new_alert.numero}, hora:{new_alert.data_hora_alerta}")
+                            self.db_client.insert_record(new_alert.id)
                 except Exception as e:
                     self.logger.error(f"Error dealing with incident! id:{new_alert.id}, numero:{new_alert.numero}, hora:{new_alert.data_hora_alerta}. Reason {e}")
 
@@ -65,6 +74,7 @@ if __name__ == "__main__":
     gescorp_client = GescorpClient(logger, app_config)
     db_client = DBClient(logger)
     sms_sender = SMSSender(logger=logger, api_url=app_config.sms_sender_url, user=app_config.sms_sender_usr, password=app_config.sms_sender_pwd)
-    orchestrator = Orchestrator(logger, app_config, gescorp_client, db_client, sms_sender)
+    wu_client = WUClient(logger=logger,time_out=15)
+    orchestrator = Orchestrator(logger, app_config, gescorp_client, db_client, sms_sender, wu_client)
     orchestrator.test_mode = True
     orchestrator.notify_new_alerts()

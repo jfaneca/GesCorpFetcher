@@ -14,31 +14,37 @@ class SMSSender:
         self.password = password
 
     def send(self, message, phone_numbers):
-        message = domain.Message(
-            message,
-            phone_numbers
-        )
-        current_pid = os.getpid()
 
-        with client.APIClient(
-            self.user,
-            self.password,
-            base_url=self.api_url
-        ) as c:
-            state = c.send(message)
-            #print(state)
+        try:
+            message = domain.Message(
+                message,
+                phone_numbers
+            )
+            current_pid = os.getpid()
 
-            state = c.get_state(state.id)
-            while state.state == 'Pending':
-                self.logger.info(f"Pending, sleeping half a second. Message:{message}, pid:[{current_pid}]")
-                time.sleep(0.5)
+            with client.APIClient(
+                self.user,
+                self.password,
+                base_url=self.api_url
+            ) as c:
+                state = c.send(message)
+                #print(state)
+
                 state = c.get_state(state.id)
+                while state.state == 'Pending':
+                    self.logger.info(f"Pending, sleeping half a second. Message:{message}, pid:[{current_pid}]")
+                    time.sleep(0.5)
+                    state = c.get_state(state.id)
 
-            if state.state == 'Failed':
-                self.logger.error(f"Envio falhado. Message:{message}, pid:[{current_pid}]")
-            else:
-                self.logger.info(f"Envio efetuado com sucesso! Message:{message}, pid:[{current_pid}]")
-                return True
+                if state.state == 'Failed':
+                    self.logger.error(f"Envio falhado. Message:{message}, pid:[{current_pid}]")
+                else:
+                    self.logger.info(f"Envio efetuado com sucesso! Message:{message}, pid:[{current_pid}]")
+                    return True
+
+        except  Exception as e:
+            self.logger.error(f"Error while sending {message} to {phone_numbers}. Reason: {e}")
+            return False
 
         return False
 

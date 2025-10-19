@@ -1,3 +1,4 @@
 requests
 apscheduler
 android-sms-gateway
+pywhatkit
