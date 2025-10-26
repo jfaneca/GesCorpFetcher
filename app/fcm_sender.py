@@ -25,11 +25,10 @@ class FCMSender:
                     title="Notificações GesCorp",
                     body=msg,
                 ),
-                # You can add custom data payload here if needed:
-                # data={
-                #     'key1': 'value1',
-                #     'key2': 'value2',
-                # },
+                data={
+                     'title': "Notificações GesCorp",
+                     'body': msg
+                 },
                 token=fcm_token,
             )
             try:
