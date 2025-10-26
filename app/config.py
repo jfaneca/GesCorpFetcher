@@ -15,8 +15,10 @@ class AppConfig:
             self.sms_sender_pwd = data.get("sms_sender_pwd")
             phone_numbers_from_file = data.get("phone_numbers")
             self.phone_numbers = []
+            self.fcm_tokens = []
             for elem in phone_numbers_from_file:
                 self.phone_numbers.append(elem["phone_number"])
+                self.fcm_tokens.append(elem["fcm_token"])
         except FileNotFoundError:
             print(f"File not found: {filename}")
         except Exception as e:
